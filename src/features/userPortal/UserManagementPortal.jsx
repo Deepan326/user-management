@@ -109,9 +109,8 @@ export default function UserManagementPortal() {
         console.log("server down");
       }
     });
-  }, []); // Fetch data once on mount
+  }, []); 
 
-  // Calculate the users to display for the current page
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = userList.slice(indexOfFirstUser, indexOfLastUser);
@@ -122,53 +121,64 @@ export default function UserManagementPortal() {
       <Button variant="contained" color="primary" onClick={handleButtonClick} style={{ marginLeft: '80%', marginBottom: '1%' }}>
         Add User
       </Button>
+      <div style={{ display: 'flex', justifyContent: 'flex-start'}}>
+        <h2>User Management</h2>
+      </div>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <TableContainer component={Paper}>
-          {userList.length > 0 && (
-            <Table aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  {userData.map((row, index) => (
-                    <TableCell align='left' key={index}><b>{row}</b></TableCell>
-                  ))}
-                  <TableCell align='left'><b>Actions</b></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {currentUsers.map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell>{row.first_name}</TableCell>
-                    <TableCell>{row.last_name}</TableCell>
-                    <TableCell>{row.username}</TableCell>
-                    <TableCell>{row.age}</TableCell>
-                    <TableCell>{row.marital_status}</TableCell>
-                    <TableCell>{row.is_employed ? 'true' : 'false'}</TableCell>
-                    <TableCell>{row.is_founder ? 'true' : 'false'}</TableCell>
-                    <TableCell>
-                      <IconButton onClick={() => handleEditUser(row)}>
-                        <FontAwesomeIcon icon={faEdit} style={{ fontSize: '15px' }} />
-                      </IconButton>
-                      <IconButton onClick={() => handleDeleteUser(row)}>
-                        <FontAwesomeIcon icon={faTrash} style={{ fontSize: '15px' }} />
-                      </IconButton>
-                    </TableCell>
+          {userList.length > 0 ? (
+            <>
+              <Table aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    {userData.map((row, index) => (
+                      <TableCell align='left' key={index}><b>{row}</b></TableCell>
+                    ))}
+                    <TableCell align='left'><b>Actions</b></TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHead>
+                <TableBody>
+                  {currentUsers.map((row) => (
+                    <TableRow key={row.id}>
+                      <TableCell>{row.first_name}</TableCell>
+                      <TableCell>{row.last_name}</TableCell>
+                      <TableCell>{row.username}</TableCell>
+                      <TableCell>{row.age}</TableCell>
+                      <TableCell>{row.marital_status}</TableCell>
+                      <TableCell>{row.is_employed ? 'true' : 'false'}</TableCell>
+                      <TableCell>{row.is_founder ? 'true' : 'false'}</TableCell>
+                      <TableCell>
+                        <IconButton onClick={() => handleEditUser(row)}>
+                          <FontAwesomeIcon icon={faEdit} style={{ fontSize: '15px' }} />
+                        </IconButton>
+                        <IconButton onClick={() => handleDeleteUser(row)}>
+                          <FontAwesomeIcon icon={faTrash} style={{ fontSize: '15px' }} />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </>
+          ) : (
+            <div style={{ padding: '20px', textAlign: 'center' }}>
+              <h4>User list is empty. Click "Add User" to add a new user.</h4>
+            </div>
           )}
         </TableContainer>
       </div>
-      <div style={{ padding: '1%', margin: '40px', marginLeft: '65%' }}>
-        <Stack spacing={2}>
-          <Pagination 
-            count={totalPages} 
-            shape="rounded" 
-            onChange={(event, value) => setCurrentPage(value)} 
-            page={currentPage} 
-          />
-        </Stack>
-      </div>
+      {userList.length > 0 && (
+        <div style={{ padding: '1%', margin: '40px', marginLeft: '65%' }}>
+          <Stack spacing={2}>
+            <Pagination 
+              count={totalPages} 
+              shape="rounded" 
+              onChange={(event, value) => setCurrentPage(value)} 
+              page={currentPage} 
+            />
+          </Stack>
+        </div>
+      )}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{isEditing ? 'Edit User' : 'Add User'}</DialogTitle>
         <DialogContent>
