@@ -24,7 +24,6 @@ import { toast } from 'react-toastify';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 
-
 export default function UserManagementPortal() {
   const [userList, setUserList] = useState([]);
   const [open, setOpen] = useState(false);
@@ -39,6 +38,9 @@ export default function UserManagementPortal() {
     is_employed: false,
     is_founder: false,
   });
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 5;
 
   const userData = ["First Name", "Last Name", "User Name", "Age", "Marital Status", "Is Employed", "Is Founder"];
 
@@ -96,13 +98,12 @@ export default function UserManagementPortal() {
 
   const handleDeleteUser = (row) => {
     setUserList(userList.filter(user => user.id !== row.id));
-    toast.success(` ${row.first_name} deleted successfully`)
+    toast.success(`${row.first_name} deleted successfully`);
   };
 
   useEffect(() => {
     axios.get("https://mocki.io/v1/a6a0fb6b-a84a-4934-b3f2-5c92cc77c44e").then(res => {
       if (res.status === 200) {
-        
         setUserList(res.data.map(user => ({ ...user, id: Date.now() + Math.random() }))); // Adding unique IDs
       } else {
         console.log("server down");
@@ -110,18 +111,21 @@ export default function UserManagementPortal() {
     });
   }, []); // Fetch data once on mount
 
+  // Calculate the users to display for the current page
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = userList.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(userList.length / usersPerPage);
+
   return (
     <div style={{ justifyContent: 'flex-end', padding: '6%', margin: '40px' }}>
       <Button variant="contained" color="primary" onClick={handleButtonClick} style={{ marginLeft: '80%', marginBottom: '1%' }}>
         Add User
       </Button>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <React.Fragment>
-          <TableContainer component={Paper}>
-            {
-              userList.length>0 &&
-            
-            <Table  aria-label="simple table">
+        <TableContainer component={Paper}>
+          {userList.length > 0 && (
+            <Table aria-label="simple table">
               <TableHead>
                 <TableRow>
                   {userData.map((row, index) => (
@@ -131,7 +135,7 @@ export default function UserManagementPortal() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {userList.map((row) => (
+                {currentUsers.map((row) => (
                   <TableRow key={row.id}>
                     <TableCell>{row.first_name}</TableCell>
                     <TableCell>{row.last_name}</TableCell>
@@ -142,25 +146,29 @@ export default function UserManagementPortal() {
                     <TableCell>{row.is_founder ? 'true' : 'false'}</TableCell>
                     <TableCell>
                       <IconButton onClick={() => handleEditUser(row)}>
-                      <FontAwesomeIcon icon={faEdit} style={{ fontSize: '15px' }} />
+                        <FontAwesomeIcon icon={faEdit} style={{ fontSize: '15px' }} />
                       </IconButton>
                       <IconButton onClick={() => handleDeleteUser(row)}>
-                      <FontAwesomeIcon icon={faTrash} style={{ fontSize: '15px' }} />
+                        <FontAwesomeIcon icon={faTrash} style={{ fontSize: '15px' }} />
                       </IconButton>
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-}
-         </TableContainer>
-        </React.Fragment>
+          )}
+        </TableContainer>
       </div>
-  <div style={{ padding: '1%', margin: '40px' ,marginLeft:'65%'}}>
-      <Stack spacing={2}>
-      <Pagination count={5} shape="rounded" />
-     </Stack>
-     </div>
+      <div style={{ padding: '1%', margin: '40px', marginLeft: '65%' }}>
+        <Stack spacing={2}>
+          <Pagination 
+            count={totalPages} 
+            shape="rounded" 
+            onChange={(event, value) => setCurrentPage(value)} 
+            page={currentPage} 
+          />
+        </Stack>
+      </div>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{isEditing ? 'Edit User' : 'Add User'}</DialogTitle>
         <DialogContent>
@@ -174,8 +182,7 @@ export default function UserManagementPortal() {
             name="first_name"
             value={currentUser.first_name}
             onChange={handleChange}
-            required ={true}
-
+            required={true}
           />
           <TextField
             margin="dense"
@@ -186,8 +193,7 @@ export default function UserManagementPortal() {
             name="last_name"
             value={currentUser.last_name}
             onChange={handleChange}
-            required ={true}
-
+            required={true}
           />
           <TextField
             margin="dense"
@@ -198,8 +204,7 @@ export default function UserManagementPortal() {
             name="username"
             value={currentUser.username}
             onChange={handleChange}
-            required ={true}
-
+            required={true}
           />
           <TextField
             margin="dense"
@@ -210,8 +215,7 @@ export default function UserManagementPortal() {
             name="age"
             value={currentUser.age}
             onChange={handleChange}
-            required ={true}
-
+            required={true}
           />
           <TextField
             margin="dense"
@@ -222,7 +226,7 @@ export default function UserManagementPortal() {
             name="marital_status"
             value={currentUser.marital_status}
             onChange={handleChange}
-            required ={true}
+            required={true}
           />
           <FormControlLabel
             control={<Checkbox checked={currentUser.is_employed} onChange={handleChange} name="is_employed" />}
