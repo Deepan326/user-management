@@ -21,6 +21,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import Pagination from '@mui/material/Pagination';
+import Stack from '@mui/material/Stack';
+
 
 export default function UserManagementPortal() {
   const [userList, setUserList] = useState([]);
@@ -153,6 +156,11 @@ export default function UserManagementPortal() {
          </TableContainer>
         </React.Fragment>
       </div>
+  <div style={{ padding: '1%', margin: '40px' ,marginLeft:'65%'}}>
+      <Stack spacing={2}>
+      <Pagination count={5} shape="rounded" />
+     </Stack>
+     </div>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{isEditing ? 'Edit User' : 'Add User'}</DialogTitle>
         <DialogContent>
@@ -166,6 +174,8 @@ export default function UserManagementPortal() {
             name="first_name"
             value={currentUser.first_name}
             onChange={handleChange}
+            required ={true}
+
           />
           <TextField
             margin="dense"
@@ -176,6 +186,8 @@ export default function UserManagementPortal() {
             name="last_name"
             value={currentUser.last_name}
             onChange={handleChange}
+            required ={true}
+
           />
           <TextField
             margin="dense"
@@ -186,6 +198,8 @@ export default function UserManagementPortal() {
             name="username"
             value={currentUser.username}
             onChange={handleChange}
+            required ={true}
+
           />
           <TextField
             margin="dense"
@@ -196,6 +210,8 @@ export default function UserManagementPortal() {
             name="age"
             value={currentUser.age}
             onChange={handleChange}
+            required ={true}
+
           />
           <TextField
             margin="dense"
@@ -206,6 +222,7 @@ export default function UserManagementPortal() {
             name="marital_status"
             value={currentUser.marital_status}
             onChange={handleChange}
+            required ={true}
           />
           <FormControlLabel
             control={<Checkbox checked={currentUser.is_employed} onChange={handleChange} name="is_employed" />}
