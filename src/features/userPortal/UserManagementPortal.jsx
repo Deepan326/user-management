@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Table from '@mui/material/Table';
 import {
-  Paper,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Button,
   Dialog,
   DialogActions,
@@ -15,14 +8,13 @@ import {
   TextField,
   Checkbox,
   FormControlLabel,
-  IconButton,
 } from '@mui/material';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
+import * as REST_URL from '../utils/RestURL';
+import TableComponent from './components/TableComponent';
 
 export default function UserManagementPortal() {
   const [userList, setUserList] = useState([]);
@@ -42,7 +34,6 @@ export default function UserManagementPortal() {
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 5;
 
-  const userData = ["First Name", "Last Name", "User Name", "Age", "Marital Status", "Is Employed", "Is Founder"];
 
   const handleButtonClick = () => {
     setIsEditing(false);
@@ -75,7 +66,7 @@ export default function UserManagementPortal() {
     const { first_name, last_name, username, age, marital_status } = currentUser;
 
     if (!first_name || !last_name || !username || !age || !marital_status) {
-      toast.error("Please fill in all fields.");
+      toast.error("Please fill all fields.");
       return;
     }
 
@@ -90,23 +81,14 @@ export default function UserManagementPortal() {
     handleClose();
   };
     
-  const handleEditUser = (user) => {
-    setCurrentUser(user);
-    setIsEditing(true);
-    setOpen(true);
-  };
-
-  const handleDeleteUser = (row) => {
-    setUserList(userList.filter(user => user.id !== row.id));
-    toast.success(`${row.first_name} deleted successfully`);
-  };
+  
 
   useEffect(() => {
-    axios.get("https://mocki.io/v1/a6a0fb6b-a84a-4934-b3f2-5c92cc77c44e").then(res => {
+    axios.get(REST_URL.DOMAIN_URL + REST_URL.GET_USER_PATH).then(res => {
       if (res.status === 200) {
         setUserList(res.data.map(user => ({ ...user, id: Date.now() + Math.random() }))); // Adding unique IDs
       } else {
-        console.log("server down");
+        console.log("Service unavailable");
       }
     });
   }, []); 
@@ -117,58 +99,28 @@ export default function UserManagementPortal() {
   const totalPages = Math.ceil(userList.length / usersPerPage);
 
   return (
-    <div style={{ justifyContent: 'flex-end', padding: '6%', margin: '40px' }}>
-      <Button variant="contained" color="primary" onClick={handleButtonClick} style={{ marginLeft: '80%', marginBottom: '1%' }}>
+    <div style={{ justifyContent: 'flex-end', padding: '4%', margin: '40px' }}>
+      
+      <div style={{ display: 'flex', justifyContent: 'space-between'}}>
+        <h2>USER MANAGEMENT</h2>
+        <span>
+        <Button variant="contained" color="primary" onClick={handleButtonClick} >
         Add User
       </Button>
-      <div style={{ display: 'flex', justifyContent: 'flex-start'}}>
-        <h2>User Management</h2>
+        </span>
       </div>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <TableContainer component={Paper}>
-          {userList.length > 0 ? (
-            <>
-              <Table aria-label="simple table">
-                <TableHead>
-                  <TableRow>
-                    {userData.map((row, index) => (
-                      <TableCell align='left' key={index}><b>{row}</b></TableCell>
-                    ))}
-                    <TableCell align='left'><b>Actions</b></TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {currentUsers.map((row) => (
-                    <TableRow key={row.id}>
-                      <TableCell>{row.first_name}</TableCell>
-                      <TableCell>{row.last_name}</TableCell>
-                      <TableCell>{row.username}</TableCell>
-                      <TableCell>{row.age}</TableCell>
-                      <TableCell>{row.marital_status}</TableCell>
-                      <TableCell>{row.is_employed ? 'true' : 'false'}</TableCell>
-                      <TableCell>{row.is_founder ? 'true' : 'false'}</TableCell>
-                      <TableCell>
-                        <IconButton onClick={() => handleEditUser(row)}>
-                          <FontAwesomeIcon icon={faEdit} style={{ fontSize: '15px' }} />
-                        </IconButton>
-                        <IconButton onClick={() => handleDeleteUser(row)}>
-                          <FontAwesomeIcon icon={faTrash} style={{ fontSize: '15px' }} />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </>
-          ) : (
-            <div style={{ padding: '20px', textAlign: 'center' }}>
-              <h4>User list is empty. Click "Add User" to add a new user.</h4>
-            </div>
-          )}
-        </TableContainer>
+        <TableComponent 
+          setCurrentUser={setCurrentUser}
+          setIsEditing={setIsEditing}
+          setOpen={setOpen}
+          setUserList={setUserList}
+          userList={userList}
+          currentUsers={currentUsers}
+        />
       </div>
       {userList.length > 0 && (
-        <div style={{ padding: '1%', margin: '40px', marginLeft: '65%' }}>
+        <div style={{ padding: '1%', display:"flex", alignItems:"flex-end", justifyContent:"flex-end"}}>
           <Stack spacing={2}>
             <Pagination 
               count={totalPages} 
