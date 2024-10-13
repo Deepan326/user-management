@@ -1,15 +1,14 @@
-import logo from './logo.svg';
 import './App.css';
-import UserManagementPortal from './features/userPortal/UserManagementPortal';
 import { Bounce, ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
+import UserManagementPortal from './features/userPortal/UserManagementPortal';
 
 
 function App() {
   return (
     <div className="App">
 
-          <UserManagementPortal/>
+          <UserManagementPortal  />
           <ToastContainer 
           position="top-right"
           autoClose={5000}
